@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context="com.nearur.timetable.New">
+
+    <LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textView3"
+        android:textColor="@color/colorPrimary"
+        android:textAlignment="center"
+        android:textSize="30dp"
+        android:layout_marginTop="6dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Kindly Enter Details" />
+
+    <EditText
+        android:id="@+id/editTextnumber"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="number"
+        android:hint="Lecture Number" />
+
+        <EditText
+            android:layout_marginTop="10dp"
+            android:id="@+id/editTextname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:hint="Subject" />
+
+
+        <RadioGroup
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+    <RadioButton
+        android:id="@+id/radioButtonL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Lecture" />
+
+    <RadioButton
+        android:id="@+id/radioButtonP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Practical" />
+
+    <RadioButton
+        android:id="@+id/radioButtonT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tutorial" />
+
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/editTextteacher"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="Teacher" />
+
+    <EditText
+        android:id="@+id/editTextroom"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="Room" />
+
+        <AutoCompleteTextView
+            android:id="@+id/editTextday"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="WeekDay" />
+
+
+    <Button
+        android:id="@+id/buttondone"
+        android:layout_marginTop="10dp"
+        android:background="@color/colorPrimary"
+        android:textColor="@android:color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add" />
+</LinearLayout>
+</ScrollView>
