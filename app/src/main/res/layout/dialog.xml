@@ -6,14 +6,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="30dp"
     android:padding="16dp">
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_marginTop="10dp"
         android:textColor="@color/colorPrimary"
-        android:textSize="30dp"
+        android:textSize="24dp"
         android:textAlignment="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,17 +26,28 @@
         android:inputType="textPersonName"
         android:hint="What's your Name?" />
 
+    <AutoCompleteTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:id="@+id/auto"
+        android:hint="Class(Ex: D3CSEA1)"/>
+
+
     <EditText
         android:id="@+id/editTextnumber"
         android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:hint="Class(ex: D3CSEA1)" />
+        android:inputType="number"
+        android:hint="Number of Lectures/Day" />
+
+
 
     <Button
         android:id="@+id/buttonsubmit"
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:background="@color/colorPrimary"
         android:textColor="@android:color/white"

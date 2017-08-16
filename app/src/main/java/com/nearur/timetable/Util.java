@@ -23,7 +23,7 @@ public class Util {
     public static final String saturday="saturday";
     public static final String sunday="sunday";
 
-    public static final String subid="Id";
+
     public static final String sname="Name";
     public static final String attended="Attended";
     public static final String total="Total";

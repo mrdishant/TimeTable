@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,12 +29,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -169,32 +180,81 @@ public class MainActivity extends AppCompatActivity
     void first(){
         sharedPreferences=getSharedPreferences("Time",MODE_PRIVATE);
         editor=sharedPreferences.edit();
-        if(!sharedPreferences.contains("name")){
+        if(!sharedPreferences.contains("class")){
             final Dialog d=new Dialog(MainActivity.this);
             d.setContentView(R.layout.dialog);
+            d.setCancelable(false);
             Button btn=(Button)d.findViewById(R.id.buttonsubmit);
             final EditText name=(EditText)d.findViewById(R.id.editTextname);
             final EditText number=(EditText)d.findViewById(R.id.editTextnumber);
+            final AutoCompleteTextView autoCompleteTextView=(AutoCompleteTextView)d.findViewById(R.id.auto);
+            ArrayAdapter<String>adapter=new ArrayAdapter<String>(MainActivity.this,android.R.layout.simple_spinner_dropdown_item);
+            adapter.add("D3CSEA1");
+            adapter.add("D3CSEA2");
+            autoCompleteTextView.setAdapter(adapter);
             btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     editor.putString("name",name.getText().toString().trim());
                     editor.putInt("number",Integer.parseInt(number.getText().toString().trim()));
+                    editor.putString("class",autoCompleteTextView.getText().toString().toUpperCase().trim());
                     editor.commit();
                     Uri x=null;
-                    for (int i=1;i<= sharedPreferences.getInt("number",0); i++){
+                    for (int i=1;i<=Integer.parseInt(number.getText().toString().trim()) ; i++){
                         ContentValues values=new ContentValues();
                         values.put(Util.number,i);
                         x=resolver.insert(Util.u,values);
                     }
                     Toast.makeText(MainActivity.this,"Lectures : "+x.getLastPathSegment(),Toast.LENGTH_LONG).show();
+
+                    for (int i=1;i<=8;i++){
+                        final String w="Number = "+i;
+                        String Url="https://missnainathaman.000webhostapp.com/getData.php?id="+autoCompleteTextView.getText().toString().toUpperCase().trim()+"&lec="+i;
+                        StringRequest request=new StringRequest(Url, new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+
+                                try{
+                                    JSONObject jsonObject=new JSONObject(response);
+                                    JSONArray array=jsonObject.getJSONArray("result");
+                                    JSONObject r=array.getJSONObject(0);
+                                    ContentValues values=new ContentValues();
+                                    ContentValues values1=new ContentValues();
+                                    Lecture lecture=new Lecture("","","","");
+
+                                    for(int i=1;i<=5;i++){
+                                        String[] str=r.getString(days[i]).split("\n");
+                                        lecture.name=str[0].trim();
+                                        lecture.tname=str[1];
+                                        lecture.room=str[2];
+                                        lecture.type=str[3];
+                                        values.put(days[i],lecture.toString());
+                                        values1.put(Util.sname,str[0].trim());
+                                        resolver.insert(Util.u1,values1);
+                                    }
+                                    resolver.update(Util.u,values,w,null);
+                                }catch (Exception e){
+
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+
+                            }
+                        }
+                        );
+                        RequestQueue requestQueue= Volley.newRequestQueue(MainActivity.this);
+                        requestQueue.add(request);
+                    }
                     d.dismiss();
                     init(today);
                 }
             });
             d.show();
         }
-        textView.setText(sharedPreferences.getString("name","Click on Image"));
+        textView.setText(sharedPreferences.getString("name","Click on Image")+"\n"+sharedPreferences.getString("class",""));
+
     }
     void init(String day){
         textView2.setVisibility(View.VISIBLE);
@@ -207,7 +267,7 @@ public class MainActivity extends AppCompatActivity
             if(cursor!=null) {
                 cursor.moveToNext();
                 if(cursor.getString(0)!=null){
-                    textView2.setVisibility(View.INVISIBLE);
+                    textView2.setVisibility(View.GONE);
                     adapter.add(i+"\n"+cursor.getString(0));
                 }
             }
@@ -237,7 +297,7 @@ public class MainActivity extends AppCompatActivity
                             int x = resolver.update(Util.u1, values, w, null);
                             Toast.makeText(MainActivity.this, "Cool,Study is Required", Toast.LENGTH_LONG).show();
                             c.close();}catch (Exception e){
-                                Toast.makeText(MainActivity.this,"Subject Name not Matching",Toast.LENGTH_LONG).show();
+                                Toast.makeText(MainActivity.this,"Subject Name not Matching\nLong Press To Update",Toast.LENGTH_LONG).show();
                             }
 
                         }
