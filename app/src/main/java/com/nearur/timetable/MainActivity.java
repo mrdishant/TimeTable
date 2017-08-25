@@ -20,6 +20,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.util.Base64;
+import android.view.ContextMenu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-
+        registerForContextMenu(listView);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -128,9 +129,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        getMenuInflater().inflate(R.menu.main,menu);
     }
 
     @Override
@@ -348,20 +354,17 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent=new Intent(MainActivity.this,New.class);
-                d.dismiss();
-                intent.putExtra("Number",i+1);
-                startActivityForResult(intent,7623);
-                return false;
-            }
-        });
+
         if(sharedPreferences.contains("image")) {
             byte[] imageAsBytes = Base64.decode(sharedPreferences.getString("image", "").getBytes(), 0);
             imageView.setImageBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length));
         }
+    }
+
+    void update(int i){
+        Intent intent=new Intent(MainActivity.this,New.class);
+        intent.putExtra("Number",i+1);
+        startActivityForResult(intent,7623);
     }
 
     @Override

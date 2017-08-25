@@ -4,11 +4,14 @@ import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
+import android.widget.ImageButton;
+import android.widget.Toast;
 import android.widget.Toolbar;
 
 import java.util.ArrayList;
@@ -30,17 +33,22 @@ public class MyAdapter extends ArrayAdapter<String> {
 
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(int position, @Nullable final View convertView, @NonNull final ViewGroup parent) {
 
-        View view= LayoutInflater.from(context).inflate(resource,parent,false);
+        final View v= LayoutInflater.from(context).inflate(resource,parent,false);
 
         String s=objects.get(position);
 
-        CheckedTextView checkedTextView=(CheckedTextView)view.findViewById(R.id.checkedTextViewstring);
+        final CheckedTextView checkedTextView=(CheckedTextView)v.findViewById(R.id.checkedTextViewstring);
         checkedTextView.setText(s);
-
-        return view;
+        final ImageButton button=(ImageButton)v.findViewById(R.id.toolbarcard);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                parent.showContextMenuForChild(view);
+            }
+        });
+        return v;
     }
-
 
 }
