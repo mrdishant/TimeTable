@@ -11,9 +11,11 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -58,7 +60,8 @@ public class MainActivity extends AppCompatActivity
     SharedPreferences.Editor editor;
     ContentResolver resolver;
     ListView listView;
-    ArrayAdapter<String> adapter;
+    ArrayList<String> arrayList;
+    MyAdapter myAdapter;
     String []days={"sunday","monday","tuesday","wednesday","thursday","friday","saturday"};
     String  today;
     TextView textView,textView2;
@@ -180,86 +183,104 @@ public class MainActivity extends AppCompatActivity
     void first(){
         sharedPreferences=getSharedPreferences("Time",MODE_PRIVATE);
         editor=sharedPreferences.edit();
-        if(!sharedPreferences.contains("class")){
-            final Dialog d=new Dialog(MainActivity.this);
-            d.setContentView(R.layout.dialog);
-            d.setCancelable(false);
-            Button btn=(Button)d.findViewById(R.id.buttonsubmit);
-            final EditText name=(EditText)d.findViewById(R.id.editTextname);
-            final EditText number=(EditText)d.findViewById(R.id.editTextnumber);
-            final AutoCompleteTextView autoCompleteTextView=(AutoCompleteTextView)d.findViewById(R.id.auto);
-            ArrayAdapter<String>adapter=new ArrayAdapter<String>(MainActivity.this,android.R.layout.simple_spinner_dropdown_item);
-            adapter.add("D3CSEA1");
-            adapter.add("D3CSEA2");
-            autoCompleteTextView.setAdapter(adapter);
-            btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    editor.putString("name",name.getText().toString().trim());
-                    editor.putInt("number",Integer.parseInt(number.getText().toString().trim()));
-                    editor.putString("class",autoCompleteTextView.getText().toString().toUpperCase().trim());
-                    editor.commit();
-                    Uri x=null;
-                    for (int i=1;i<=Integer.parseInt(number.getText().toString().trim()) ; i++){
-                        ContentValues values=new ContentValues();
-                        values.put(Util.number,i);
-                        x=resolver.insert(Util.u,values);
-                    }
-                    Toast.makeText(MainActivity.this,"Lectures : "+x.getLastPathSegment(),Toast.LENGTH_LONG).show();
+            if(!sharedPreferences.contains("class")) {
+                if (CheckConnectivity(this)) {
+                    final Dialog d = new Dialog(MainActivity.this);
+                    d.setContentView(R.layout.dialog);
+                    d.setCancelable(false);
+                    Button btn = (Button) d.findViewById(R.id.buttonsubmit);
+                    final EditText name = (EditText) d.findViewById(R.id.editTextname);
+                    final EditText number = (EditText) d.findViewById(R.id.editTextnumber);
+                    final AutoCompleteTextView autoCompleteTextView = (AutoCompleteTextView) d.findViewById(R.id.auto);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item);
+                    adapter.add("D3CSEA1");
+                    adapter.add("D3CSEA2");
+                    autoCompleteTextView.setAdapter(adapter);
+                    btn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            editor.putString("name", name.getText().toString().trim());
+                            editor.putInt("number", Integer.parseInt(number.getText().toString().trim()));
+                            editor.putString("class", autoCompleteTextView.getText().toString().toUpperCase().trim());
+                            editor.commit();
+                            Uri x = null;
+                            for (int i = 1; i <= Integer.parseInt(number.getText().toString().trim()); i++) {
+                                ContentValues values = new ContentValues();
+                                values.put(Util.number, i);
+                                x = resolver.insert(Util.u, values);
+                            }
+                            Toast.makeText(MainActivity.this, "Lectures : " + x.getLastPathSegment(), Toast.LENGTH_LONG).show();
 
-                    for (int i=1;i<=8;i++){
-                        final String w="Number = "+i;
-                        String Url="https://missnainathaman.000webhostapp.com/getData.php?id="+autoCompleteTextView.getText().toString().toUpperCase().trim()+"&lec="+i;
-                        StringRequest request=new StringRequest(Url, new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
+                            for (int i = 1; i <= 8; i++) {
+                                final String w = "Number = " + i;
+                                String Url = "https://missnainathaman.000webhostapp.com/getData.php?id=" + autoCompleteTextView.getText().toString().toUpperCase().trim() + "&lec=" + i;
+                                StringRequest request = new StringRequest(Url, new Response.Listener<String>() {
+                                    @Override
+                                    public void onResponse(String response) {
 
-                                try{
-                                    JSONObject jsonObject=new JSONObject(response);
-                                    JSONArray array=jsonObject.getJSONArray("result");
-                                    JSONObject r=array.getJSONObject(0);
-                                    ContentValues values=new ContentValues();
-                                    ContentValues values1=new ContentValues();
-                                    Lecture lecture=new Lecture("","","","");
+                                        try {
+                                            JSONObject jsonObject = new JSONObject(response);
+                                            JSONArray array = jsonObject.getJSONArray("result");
+                                            JSONObject r = array.getJSONObject(0);
+                                            ContentValues values = new ContentValues();
+                                            ContentValues values1 = new ContentValues();
+                                            Lecture lecture = new Lecture("", "", "", "");
 
-                                    for(int i=1;i<=5;i++){
-                                        String[] str=r.getString(days[i]).split("\n");
-                                        lecture.name=str[0].trim();
-                                        lecture.tname=str[1];
-                                        lecture.room=str[2];
-                                        lecture.type=str[3];
-                                        values.put(days[i],lecture.toString());
-                                        values1.put(Util.sname,str[0].trim());
-                                        resolver.insert(Util.u1,values1);
+                                            for (int i = 1; i <= 5; i++) {
+                                                String[] str = r.getString(days[i]).split("\n");
+                                                lecture.name = str[0].trim();
+                                                lecture.tname = str[1];
+                                                lecture.room = str[2];
+                                                lecture.type = str[3];
+                                                values.put(days[i], lecture.toString());
+                                                values1.put(Util.sname, str[0].trim());
+                                                resolver.insert(Util.u1, values1);
+                                            }
+                                            resolver.update(Util.u, values, w, null);
+                                        } catch (Exception e) {
+
+                                        }
                                     }
-                                    resolver.update(Util.u,values,w,null);
-                                }catch (Exception e){
+                                }, new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
 
+                                    }
                                 }
+                                );
+                                RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
+                                requestQueue.add(request);
                             }
-                        }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-
-                            }
+                            d.dismiss();
+                            init(today);
                         }
-                        );
-                        RequestQueue requestQueue= Volley.newRequestQueue(MainActivity.this);
-                        requestQueue.add(request);
-                    }
-                    d.dismiss();
-                    init(today);
+                    });
+                    d.show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Please Select");
+                    builder.setMessage("Please Provide Internet");
+                    builder.setPositiveButton("Wifi", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            startActivityForResult(new Intent(Settings.ACTION_WIFI_SETTINGS), 5049);
+                        }
+                    });
+                    builder.setNegativeButton("Mobile Data", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            startActivityForResult(new Intent(Settings.ACTION_DATA_ROAMING_SETTINGS), 5049);
+                        }
+                    });
+                    builder.create().show();
                 }
-            });
-            d.show();
-        }
+            }
         textView.setText(sharedPreferences.getString("name","Click on Image")+"\n"+sharedPreferences.getString("class",""));
-
     }
     void init(String day){
         textView2.setVisibility(View.VISIBLE);
         listView=(ListView)findViewById(R.id.listtoday);
-        adapter=new ArrayAdapter<String>(MainActivity.this,android.R.layout.simple_list_item_1);
+        arrayList=new ArrayList<>();
         String[] p={day};
         for (int i=1;i<=sharedPreferences.getInt("number",0);i++){
             String w="Number = "+i;
@@ -268,16 +289,20 @@ public class MainActivity extends AppCompatActivity
                 cursor.moveToNext();
                 if(cursor.getString(0)!=null){
                     textView2.setVisibility(View.GONE);
-                    adapter.add(i+"\n"+cursor.getString(0));
+                    arrayList.add(i+cursor.getString(0));
                 }
             }
             cursor.close();
         }
-        listView.setAdapter(adapter);
+        myAdapter=new MyAdapter(MainActivity.this,R.layout.card,arrayList);
+        listView.setAdapter(myAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, final int i1, long l) {
-                String sub = adapter.getItem(i1);
+                String sub = arrayList.get(i1);
+                if(sub.toLowerCase().contains("recess")||sub.toLowerCase().contains("free")) {
+                }
+                else{
                 final String w = "Name=\"" + sub.substring(sub.indexOf(":") + 1, sub.indexOf("Teacher")).trim() + "\"";
                 String[] p = {"Name", "Attended", "Missed", "Total"};
                     final Cursor c = resolver.query(Util.u1, p, w, null, null);
@@ -320,6 +345,7 @@ public class MainActivity extends AppCompatActivity
                     builder.setTitle("Lecture :" + (i1 + 1));
                     d=builder.create();
                     d.show();
+                }
             }
         });
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -372,6 +398,19 @@ public class MainActivity extends AppCompatActivity
             {
                 Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
             }
+        }
+        if(requestCode==5049){
+            first();
+        }
+    }
+    public boolean CheckConnectivity(final Context c) {
+        ConnectivityManager mConnectivityManager = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (mConnectivityManager.getActiveNetworkInfo() != null
+                && mConnectivityManager.getActiveNetworkInfo().isAvailable()
+                && mConnectivityManager.getActiveNetworkInfo().isConnected()) {
+            return true;
+        } else {
+            return false;
         }
     }
     }

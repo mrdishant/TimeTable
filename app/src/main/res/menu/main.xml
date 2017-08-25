@@ -6,4 +6,15 @@
         android:orderInCategory="100"
         android:icon="@android:drawable/ic_input_add"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/options"
+        android:orderInCategory="100"
+        android:title="Attendance"/>
+
+    <item
+        android:id="@+id/assignment"
+        android:orderInCategory="100"
+        android:title="Assignment"
+        />
 </menu>
